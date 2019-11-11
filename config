@@ -1,0 +1,7 @@
+# Separate by space
+# RootDir's default value is "/home/alexander/SharedFiles"
+# Port's default value is "3000"
+# Add "#" at the front of the line to comment
+
+RootDir /home/alexander/
+Port 3000
