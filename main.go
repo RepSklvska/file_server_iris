@@ -6,14 +6,21 @@ import (
 	"github.com/kataras/iris"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
 )
 
+const (
+	ver = "0.01"
+)
+
 var (
 	rootDir = flag.String("rootdir", "", "Specify the root directory for share")
 	port    = flag.String("port", "", "Specify the port for listening")
+	version = flag.Bool("version", false, "Show version")
+	help    = flag.Bool("help", false, "Show this help message")
 )
 
 type Config struct {
@@ -121,6 +128,19 @@ func (f *Files) Sort() {
 }
 
 func main() {
+	flag.Parse()
+	if *version {
+		fmt.Println("Software Version:", ver)
+		fmt.Println("Go Compiler Version:", strings.ToUpper(runtime.Version()))
+		fmt.Println("Arch:", strings.ToUpper(runtime.GOARCH))
+		fmt.Println("System:", strings.ToUpper(runtime.GOOS))
+		return
+	}
+	if *help {
+		flag.Usage()
+		return
+	}
+
 	var config Config
 	config.Read("./config")
 
@@ -198,6 +218,6 @@ func main() {
 			ctx.SendFile(fullPath, path.Name())
 		}
 	})
-	//	fmt.Println("Root Directory", config.RootDir) //Debug
+	fmt.Println("Root Directory:", config.RootDir) //Debug
 	app.Run(iris.Addr(config.Port))
 }
