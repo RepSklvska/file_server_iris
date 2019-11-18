@@ -5,6 +5,27 @@
 	<title>{{.Location}}</title>
 </head>
 <body>
+<script>
+	window.onload = () => {
+		for (var i = 1; i < document.getElementById("fileTable").rows.length; i++) {
+			var row = document.getElementById("fileTable").rows[i];
+			var fileName = row.cells[0].id;
+			var url = document.URL;
+			if (url.indexOf("#") !== -1) {
+				url = url.slice(0, url.indexOf("#"));
+			}
+			if (url[url.length - 1] != "/") {
+				url += "/";
+			}
+			if (fileName == "..") {
+				fileName = ""
+				url = url.slice(0, url.length - 1)
+				url = url.slice(0, url.lastIndexOf("/"))
+			}
+			row.cells[0].innerHTML = "<a href=\"" + url + fileName + "\">" + fileName + "</a>";
+		}
+	}
+</script>
 <div>
 	<span>
 		<h3>Index of {{.Location}}</h3>
@@ -14,16 +35,16 @@
 	</span>
 </div>
 <div>
-	<table>
+	<table id="fileTable">
 		<thead>
 		<tr>
-			<th style="width: 55%">
+			<th style="width: 55%" align="left">
 				<a href="#">File Name</a>
 			</th>
-			<th style="width: 20%">
+			<th style="width: 20%" align="left">
 				<a href="#">File Size</a>
 			</th>
-			<th style="width: 25%">
+			<th style="width: 25%" align="left">
 				<a href="#">Last Modified</a>
 			</th>
 		</tr>
@@ -36,7 +57,7 @@
         {{end}}
         {{range $i,$v:=.Files}}
 			<tr>
-				<td><a href="#">{{$v.Name}}</a></td>
+				<td id="{{$v.Name}}"></td>
 				<td>{{$v.Size}}</td>
 				<td>{{$v.Date}}</td>
 			</tr>
