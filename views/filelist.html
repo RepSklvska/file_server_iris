@@ -14,13 +14,13 @@
 			if (url.indexOf("#") !== -1) {
 				url = url.slice(0, url.indexOf("#"));
 			}
-			if (url[url.length - 1] != "/") {
+			if (url[url.length - 1] !== "/") {
 				url += "/";
 			}
-			if (fileName == "..") {
-				fileName = ""
-				url = url.slice(0, url.length - 1)
-				url = url.slice(0, url.lastIndexOf("/"))
+			if (fileName === "..") {
+				fileName = "";
+				url = url.slice(0, url.length - 1);
+				url = url.slice(0, url.lastIndexOf("/"));
 			}
 			row.cells[0].innerHTML = "<a href=\"" + url + fileName + "\">" + fileName + "</a>";
 		}
