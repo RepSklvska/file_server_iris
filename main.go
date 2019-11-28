@@ -69,6 +69,16 @@ func (c *Config) Read(configFile string) {
 	if *port != "" {
 		c.Port = ":" + *port
 	}
+	if strings.Contains(c.RootDir, "~") {
+		homeDir := func() string {
+			userHomeDir, err := os.UserHomeDir()
+			if err != nil {
+				fmt.Println(err)
+			}
+			return userHomeDir
+		}()
+		c.RootDir = strings.ReplaceAll(c.RootDir, "~", homeDir+"/")
+	}
 	ReplaceRept(&c.RootDir, "/")
 }
 
@@ -145,26 +155,28 @@ func main() {
 	config.Read("./config")
 
 	app := iris.New()
-	//	app.Logger().SetLevel("debug")
+	app.Logger().SetLevel("debug")
 	app.RegisterView(iris.HTML("./views", ".html").Layout("templates/layout.html"))
 	app.HandleDir("/public", "./public")
 	app.HandleDir("/", config.RootDir)
 	app.OnAnyErrorCode(func(ctx iris.Context) {
+		fmt.Println(ctx.GetStatusCode(), ctx.Path()) //Debug
 		ctx.ViewData("Message", ctx.Values().GetStringDefault("message", "The page you're looking for doesn't exist"))
 		ctx.View("universal/404.html")
 	})
 	app.Favicon("./public/favicon.ico")
 
-	app.Get("/{path:path}", func(ctx iris.Context) {
+	app.Get("/*", func(ctx iris.Context) {
 		reqPath := ctx.Path()
-		//	fmt.Println("Request Path:", reqPath) //Debug
+		//reqPath := ctx.Params().Get("path")
+		fmt.Println("Request Path:", reqPath) //Debug
 		fullPath := config.RootDir + reqPath
 		ReplaceRept(&fullPath, "/")
-		//	fmt.Println("Full Path:", fullPath) //Debug
+		fmt.Println("Full Path:", fullPath) //Debug
 		path, err := os.Stat(fullPath)
-		//	fmt.Println("Path:", &path) //Debug
+		fmt.Println("Path:", &path) //Debug
 		if os.IsNotExist(err) || path == nil {
-			ctx.ViewData("Message", "Not Found.")
+			ctx.ViewData("Message", "Path Not Found.")
 			ctx.View("universal/404.html")
 		}
 		if path.IsDir() {
